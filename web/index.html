@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QazRail · Карта железных дорог Казахстана</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <aside class="rail" aria-label="Разделы">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <strong>QazRail</strong>
+          <em>Атлас КТЖ</em>
+        </div>
+      </div>
+      <nav>
+        <button class="rail-btn active" data-view="map">
+          <svg viewBox="0 0 24 24"><path d="M4 10l8-6 8 6v10H4z"/></svg>
+          Карта
+        </button>
+        <button class="rail-btn" data-view="routes">
+          <svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h11M5 17h8"/></svg>
+          Маршруты
+        </button>
+        <button class="rail-btn" data-view="stations">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.5"/></svg>
+          Станции
+        </button>
+        <button class="rail-btn" data-view="passenger">
+          <svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 8h6M9 12h6"/></svg>
+          Пассажирские
+        </button>
+        <button class="rail-btn" data-view="freight">
+          <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="10" rx="1.5"/><path d="M7 8V6h10v2"/></svg>
+          Грузовые
+        </button>
+        <button class="rail-btn" data-view="infra">
+          <svg viewBox="0 0 24 24"><path d="M4 18h16M7 18V9l5-4 5 4v9"/></svg>
+          Узлы
+        </button>
+        <button class="rail-btn" data-view="stats">
+          <svg viewBox="0 0 24 24"><path d="M6 18V10M12 18V6M18 18v-7"/></svg>
+          Сводка
+        </button>
+      </nav>
+    </aside>
+
+    <header class="bar">
+      <label class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg>
+        <input id="search" type="search" placeholder="Станция, город или маршрут…" autocomplete="off" />
+      </label>
+      <div class="bar-right">
+        <button class="btn" id="filtersBtn" type="button">Фильтры</button>
+        <button class="btn" id="layersBtn" type="button">Слои</button>
+        <button class="btn" id="themeBtn" type="button" title="Тема">Тема</button>
+      </div>
+    </header>
+
+    <main class="stage">
+      <div id="map"></div>
+
+      <div class="filters" id="filters" hidden>
+        <div class="chips">
+          <span>Тип</span>
+          <button data-f="usage" data-v="passenger">Пассажирские</button>
+          <button data-f="usage" data-v="freight">Грузовые</button>
+          <button data-f="usage" data-v="mixed">Смешанные</button>
+        </div>
+        <div class="chips">
+          <span>Сеть</span>
+          <button data-f="cat" data-v="main">Магистрали</button>
+          <button data-f="cat" data-v="regional">Региональные</button>
+          <button data-f="cat" data-v="intl">Международные</button>
+        </div>
+        <div class="chips">
+          <span>Статус</span>
+          <button data-f="status" data-v="active" class="on">Действующие</button>
+          <button data-f="status" data-v="construction">Строятся</button>
+          <button data-f="status" data-v="planned">Планируются</button>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><i class="lg main"></i> Магистраль</span>
+        <span><i class="lg reg"></i> Региональная</span>
+        <span><i class="lg freight"></i> Грузовая</span>
+        <span><i class="lg intl"></i> Международная</span>
+      </div>
+
+      <div class="hover" id="hover" hidden></div>
+      <div class="results" id="results" hidden></div>
+      <div class="layers-pop" id="layersPop" hidden>
+        <b>Карта</b>
+        <label><input type="radio" name="basemap" id="baseSat" checked /> Спутник</label>
+        <label><input type="radio" name="basemap" id="baseMap" /> Схема</label>
+        <hr />
+        <label><input type="checkbox" id="togStations" checked /> Станции</label>
+        <label><input type="checkbox" id="togHubs" checked /> Узлы</label>
+        <label><input type="checkbox" id="togIntl" checked /> Международные линии</label>
+        <label><input type="checkbox" id="togLabels" checked /> Названия городов</label>
+      </div>
+      <div class="coord" id="coord"></div>
+      <aside class="sheet" id="sheet" hidden></aside>
+      <div class="schema-card" id="schema" hidden></div>
+
+      <section class="dock" id="dock" hidden>
+        <div class="planner">
+          <label class="field">
+            <span>Откуда</span>
+            <input id="from" list="stlist" placeholder="Алматы" />
+          </label>
+          <label class="field">
+            <span>Куда</span>
+            <input id="to" list="stlist" placeholder="Астана" />
+          </label>
+          <button id="trace" type="button">Построить</button>
+        </div>
+        <datalist id="stlist"></datalist>
+        <div class="dock-list" id="dockList"></div>
+      </section>
+    </main>
+
+    <nav class="mobile-nav">
+      <button data-view="map" class="active">Карта</button>
+      <button data-view="routes">Маршруты</button>
+      <button data-view="stations">Станции</button>
+      <button data-view="search">Поиск</button>
+    </nav>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="network.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

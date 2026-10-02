@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+.venv/
+dist/
+*.log
+logs/
+*.db
+*.bak
+__pycache__/
+*.pyc
+
+# Исходные документы ТРА станций (doc/rtf/pptx), не код приложения.
+# Схемы уже разобраны в railsim/src/data/traStations.json.
+ТРА станций/

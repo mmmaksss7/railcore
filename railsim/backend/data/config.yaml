@@ -1,0 +1,29 @@
+history_hours: 72
+snapshot_interval_sec: 15
+sample_interval_sec: 8
+thresholds:
+  axlebox_c: 82
+  axlebox_alarm_c: 87
+  delay_warn_min: 5
+  delay_alarm_min: 15
+  load_warn_pct: 70
+  load_alarm_pct: 90
+  loco_health_min: 60
+  wagon_health_min: 70
+constraints:
+  max_speed_freight: 80
+  max_speed_passenger: 120
+  max_speed_intl: 90
+  dwell_min_sec: 18
+  dwell_max_sec: 55
+  max_train_length_m: 1000
+optimization:
+  reroute_load_threshold: 85
+  ktsm_stop_station: ast
+  reroute_train_id: t5503
+  alt_via_station: bxh
+  prefer_electrified: true
+index:
+  snapshot_retention_hours: 72
+  event_retention_hours: 72
+  train_sample_retention_hours: 24
